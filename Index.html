@@ -1,0 +1,171 @@
+<!DOCTYPE html>  
+<html lang="it">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>TBT2 Serramenti - Preventivo Finestre e Accessori</title>  
+<link rel="icon" type="image/png" href="favicon.png">  
+<style>  
+    body {  
+        font-family: Arial, sans-serif;  
+        background: linear-gradient(180deg, #ffffff 0%, #e8f0ff 100%);  
+        margin: 0;  
+        padding: 0;  
+        color: #003366;  
+    }  
+    header {  
+        text-align: center;  
+        border-bottom: 4px solid #003366;  
+        padding: 20px;  
+    }  
+    header img {  
+        height: 70px;  
+    }  
+    h1 {  
+        margin-top: 10px;  
+        font-size: 28px;  
+    }  
+    main {  
+        padding: 20px;  
+    }  
+    table {  
+        width: 100%;  
+        border-collapse: collapse;  
+        margin-top: 20px;  
+    }  
+    th, td {  
+        border: 1px solid #003366;  
+        padding: 8px;  
+        text-align: center;  
+    }  
+    th {  
+        background-color: #003366;  
+        color: white;  
+    }  
+    .btn {  
+        background-color: #003366;  
+        color: white;  
+        border: none;  
+        padding: 10px 20px;  
+        cursor: pointer;  
+        font-size: 16px;  
+        margin: 10px 5px;  
+    }  
+    .btn:hover {  
+        background-color: #0055aa;  
+    }  
+    footer {  
+        text-align: center;  
+        font-size: 12px;  
+        color: #555;  
+        margin-top: 30px;  
+        border-top: 1px solid #ccc;  
+        padding: 10px;  
+    }  
+</style>  
+</head>  
+<body>  
+  
+<header>  
+    <img src="Logo-TBT2.png" alt="Logo TBT2">  
+    <h1>Preventivo Finestre e Accessori</h1>  
+    <p><em>Fornitura e posa in opera di infissi, tapparelle e zanzariere</em></p>  
+    <p><strong>Documento riservato al cliente</strong></p>  
+</header>  
+  
+<main>  
+    <h2>Dati Cliente</h2>  
+    <input type="text" id="cliente" placeholder="Nome Cliente" style="width:48%;padding:5px;">  
+    <input type="text" id="indirizzo" placeholder="Indirizzo Cliente" style="width:48%;padding:5px;">  
+  
+    <h2>Tabella Calcolo</h2>  
+    <table id="preventivo">  
+        <tr>  
+            <th>Stanza</th>  
+            <th>Tipologia</th>  
+            <th>N. Ante</th>  
+            <th>Larghezza (cm)</th>  
+            <th>Altezza (cm)</th>  
+            <th>Prezzo €/m²</th>  
+            <th>Totale</th>  
+        </tr>  
+        <tr>  
+            <td><input type="text" placeholder="Es. Cucina"></td>  
+            <td>  
+                <select>  
+                    <option>Finestra</option>  
+                    <option>Porta finestra</option>  
+                    <option>Tapparella</option>  
+                    <option>Zanzariera</option>  
+                </select>  
+            </td>  
+            <td>  
+                <select>  
+                    <option>1</option><option>2</option><option>3</option>  
+                </select>  
+            </td>  
+            <td><input type="number" class="larg" placeholder="cm"></td>  
+            <td><input type="number" class="alt" placeholder="cm"></td>  
+            <td><input type="number" class="prezzo" placeholder="€/m²"></td>  
+            <td class="tot">0.00 €</td>  
+        </tr>  
+    </table>  
+  
+    <button class="btn" onclick="aggiungiRiga()">+ Aggiungi Riga</button>  
+    <button class="btn" onclick="calcolaTotale()">Calcola Totale</button>  
+    <button class="btn" onclick="generaPDF()">Genera PDF</button>  
+  
+    <h2>Riepilogo</h2>  
+    <p><strong>Totale Netto:</strong> <span id="totNetto">0.00 €</span></p>  
+    <p><strong>IVA (22%):</strong> <span id="iva">0.00 €</span></p>  
+    <p><strong>Totale Lordo:</strong> <span id="totLordo">0.00 €</span></p>  
+    <p><strong>Acconto 25%:</strong> <span id="acconto">0.00 €</span></p>  
+    <p><strong>Saldo in 120 rate:</strong> <span id="rate">0.00 €</span></p>  
+  
+</main>  
+  
+<footer>  
+    Documento generato automaticamente - © TBT2 Serramenti s.r.l. | www.tbt2.com  
+</footer>  
+  
+<script>  
+function aggiungiRiga() {  
+    let table = document.getElementById("preventivo");  
+    let row = table.insertRow(-1);  
+    row.innerHTML = `  
+        <td><input type="text" placeholder="Stanza"></td>  
+        <td><select>  
+            <option>Finestra</option><option>Porta finestra</option>  
+            <option>Tapparella</option><option>Zanzariera</option></select></td>  
+        <td><select><option>1</option><option>2</option><option>3</option></select></td>  
+        <td><input type="number" class="larg" placeholder="cm"></td>  
+        <td><input type="number" class="alt" placeholder="cm"></td>  
+        <td><input type="number" class="prezzo" placeholder="€/m²"></td>  
+        <td class="tot">0.00 €</td>`;  
+}  
+  
+function calcolaTotale() {  
+    let righe = document.querySelectorAll("#preventivo tr");  
+    let tot = 0;  
+    for (let i = 1; i < righe.length; i++) {  
+        let larg = righe[i].querySelector(".larg")?.value || 0;  
+        let alt = righe[i].querySelector(".alt")?.value || 0;  
+        let prezzo = righe[i].querySelector(".prezzo")?.value || 0;  
+        let mq = (larg * alt) / 10000;  
+        let parziale = mq * prezzo;  
+        if (!isNaN(parziale)) {  
+            righe[i].querySelector(".tot").innerText = parziale.toFixed(2) + " €";  
+            tot += parziale;  
+        }  
+    }  
+    document.getElementById("totNetto").innerText = tot.toFixed(2) + " €";  
+    let iva = tot * 0.22;  
+    document.getElementById("iva").innerText = iva.toFixed(2) + " €";  
+    let lordo = tot + iva;  
+    document.getElementById("totLordo").innerText = lordo.toFixed(2) + " €";  
+    document.getElementById("acconto").innerText = (lordo * 0.25).toFixed(2) + " €";  
+    document.getElementById("rate").innerText = ((lordo * 0.75) / 120).toFixed(2) + " €/mese";  
+}  
+</script>  
+</body>  
+</html>   
