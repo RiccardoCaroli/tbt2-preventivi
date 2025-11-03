@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TBT2 Preventivo Pro 2025</title>
+  <link rel="icon" type="image/png" href="Logo TBT.png">
+  <style>
+    :root {
+      --blu-tbt: #003366;
+      --blu-chiaro: #e6f0ff;
+      --grigio: #f8f8f8;
+      --ombra: rgba(0,0,0,0.1);
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--blu-chiaro);
+      color: var(--blu-tbt);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: white;
+      padding: 15px 30px;
+      box-shadow: 0 2px 6px var(--ombra);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header img {
+      height: 70px;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin: 0;
+    }
+
+    .versione {
+      position: fixed;
+      bottom: 8px;
+      right: 10px;
+      font-size: 12px;
+      color: #777;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px var(--ombra);
+    }
+
+    h2 {
+      border-bottom: 2px solid var(--blu-tbt);
+      padding-bottom: 4px;
+      margin-top: 25px;
+    }
+
+    input, select {
+      border: 1px solid var(--blu-tbt);
+      border-radius: 6px;
+      padding: 6px 8px;
+      width: 100%;
+      font-size: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th, td {
+      border: 1px solid var(--blu-tbt);
+      padding: 8px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    th {
+      background: var(--blu-tbt);
+      color: white;
+    }
+
+    .btn {
+      background: var(--blu-tbt);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      margin: 8px 6px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: #004c99;
+    }
+
+    .flex {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .flex .campo {
+      flex: 1 1 45%;
+    }
+
+    #pannelloOperatore {
+      display: none;
+      background: #f4f8ff;
+      border: 1px solid var(--blu-tbt);
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 15px;
+    }
+
+    #pannelloOperatore input {
+      width: 80px;
+      text-align: right;
+    }
+
+    .firma {
+      border: 2px dashed var(--blu-tbt);
+      border-radius: 8px;
+      height: 150px;
+      background: #fafafa;
+      cursor: crosshair;
+    }
+
+    @media print {
+      #pannelloOperatore, #btns, #duplicaprev, .versione {
+        display: none !important;
+      }
+      body {
+        background: white;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="Logo TBT.png" alt="Logo TBT2">
+  <div>
+    <h1>TBT2 Serramenti – Preventivo Finestre e Accessori</h1>
+  </div>
+  <button id="toggleOp" class="btn" onclick="toggleOperatore()">⚙️ Impostazioni</button>
+</header>
+
+<main>
+  <section id="datiCliente">
+    <h2>Dati Cliente</h2>
+    <div class="flex">
+      <div class="campo"><label>Nome / Ragione sociale</label><input id="cliente" type="text"></div>
+      <div class="campo"><label>Indirizzo</label><input id="indirizzo" type="text"></div>
+      <div class="campo"><label>Telefono</label><input id="telefono" type="text"></div>
+      <div class="campo"><label>Email</label><input id="email" type="email"></div>
+      <div class="campo"><label>Riferimento commerciale / agente</label><input id="agente" type="text"></div>
+    </div>
+    <p><strong>Preventivo n°</strong> <span id="numPrev"></span> — <strong>Data:</strong> <span id="dataPrev"></span></p>
+  </section>
+  <!-- Sezione Operatore (configurazioni interne) -->
+  <section id="pannelloOperatore">
+    <h2>Configurazione Operatore</h2>
+    <div class="flex">
+      <div class="campo"><label>Finestra €/m²</label><input id="pFin" type="number" value="450"></div>
+      <div class="campo"><label>Porta finestra €/m²</label><input id="pPorta" type="number" value="520"></div>
+      <div class="campo"><label>Tapparella €/m²</label><input id="pTapp" type="number" value="120"></div>
+      <div class="campo"><label>Zanzariera €/m²</label><input id="pZanz" type="number" value="90"></div>
+      <div class="campo"><label>Cassonetto €/m²</label><input id="pCass" type="number" value="160"></div>
+      <div class="campo"><label>Montaggio (%)</label><input id="pMont" type="number" value="15"></div>
+    </div>
+  </section>
+
+  <h2>Dettagli Preventivo</h2>
+  <table id="preventivo">
+    <tr>
+      <th>Stanza</th>
+      <th>Tipologia</th>
+      <th>Ante</th>
+      <th>Larg. (cm)</th>
+      <th>Alt. (cm)</th>
+      <th>Tapparella</th>
+      <th>Zanzariera</th>
+      <th>Cassonetto</th>
+      <th>Totale</th>
+      <th>Azioni</th>
+    </tr>
+  </table>
+
+  <div id="btns">
+    <button class="btn" onclick="aggiungiRiga()">➕ Aggiungi riga</button>
+    <button class="btn" onclick="calcolaTotale()">💰 Calcola Totale</button>
+    <button class="btn" onclick="duplicaPreventivo()">🔄 Duplica Preventivo</button>
+    <button class="btn" onclick="stampa()">🖨️ Stampa</button>
+    <button class="btn" onclick="scaricaPDF()">💾 Scarica PDF</button>
+  </div>
+
+  <h2>Riepilogo per Categorie</h2>
+  <div id="riepilogoCat"></div>
+
+  <h2>Riepilogo Economico</h2>
+  <div id="riepilogoEconomico">
+    <p><strong>Totale netto:</strong> <span id="totNetto">0.00 €</span></p>
+    <p><strong>IVA (22%):</strong> <span id="iva">0.00 €</span></p>
+    <p><strong>Totale lordo:</strong> <span id="totLordo">0.00 €</span></p>
+    <p><strong>Montaggio:</strong> <span id="montaggio">0.00 €</span></p>
+    <p><strong>Acconto (25%):</strong> <span id="acconto">0.00 €</span></p>
+    <p><strong>Saldo in 120 rate:</strong> <span id="rate">0.00 €</span></p>
+  </div>
+
+  <h2>Firma Cliente</h2>
+  <canvas id="firma" class="firma"></canvas><br>
+  <button class="btn" onclick="cancellaFirma()">Cancella firma</button>
+</main>
+
+<div class="versione">Versione WebApp TBT2 Pro 2025</div>
+<script>
+let numPreventivo = 1;
+
+window.onload = () => {
+  const today = new Date();
+  document.getElementById("dataPrev").innerText = today.toLocaleDateString("it-IT");
+  document.getElementById("numPrev").innerText = "PREV-2025-" + String(numPreventivo).padStart(3, "0");
+  aggiungiRiga();
+  initFirma();
+};
+
+function toggleOperatore() {
+  const panel = document.getElementById("pannelloOperatore");
+  panel.style.display = panel.style.display === "none" ? "block" : "none";
+}
+
+// Aggiungi nuova riga
+function aggiungiRiga(data = {}) {
+  const t = document.getElementById("preventivo");
+  const r = t.insertRow(-1);
+  r.innerHTML = `
+    <td><input type="text" value="${data.stanza || ""}"></td>
+    <td>
+      <select>
+        <option ${data.tipo==="Finestra"?"selected":""}>Finestra</option>
+        <option ${data.tipo==="Porta finestra"?"selected":""}>Porta finestra</option>
+        <option ${data.tipo==="Tapparella"?"selected":""}>Tapparella</option>
+        <option ${data.tipo==="Zanzariera"?"selected":""}>Zanzariera</option>
+      </select>
+    </td>
+    <td><input type="number" value="${data.ante || 1}" min="1" max="3"></td>
+    <td><input type="number" value="${data.larg || ""}"></td>
+    <td><input type="number" value="${data.alt || ""}"></td>
+    <td><input type="checkbox" ${data.tapp?"checked":""}></td>
+    <td><input type="checkbox" ${data.zanz?"checked":""}></td>
+    <td><input type="checkbox" ${data.cass?"checked":""}></td>
+    <td class="tot">0.00 €</td>
+    <td>
+      <button class="btn" onclick="duplicaRiga(this)">🔁</button>
+      <button class="btn" onclick="rimuoviRiga(this)">🗑️</button>
+    </td>`;
+}
+
+// Duplica riga
+function duplicaRiga(btn) {
+  const row = btn.closest("tr");
+  const inputs = row.querySelectorAll("input, select");
+  const data = {
+    stanza: inputs[0].value,
+    tipo: inputs[1].value,
+    ante: inputs[2].value,
+    larg: inputs[3].value,
+    alt: inputs[4].value,
+    tapp: inputs[5].checked,
+    zanz: inputs[6].checked,
+    cass: inputs[7].checked
+  };
+  aggiungiRiga(data);
+}
+
+// Rimuovi riga
+function rimuoviRiga(btn) {
+  btn.closest("tr").remove();
+}
+
+// Calcola totale
+function calcolaTotale() {
+  const righe = document.querySelectorAll("#preventivo tr:not(:first-child)");
+  const prezzi = {
+    fin: parseFloat(document.getElementById("pFin").value || 0),
+    porta: parseFloat(document.getElementById("pPorta").value || 0),
+    tapp: parseFloat(document.getElementById("pTapp").value || 0),
+    zanz: parseFloat(document.getElementById("pZanz").value || 0),
+    cass: parseFloat(document.getElementById("pCass").value || 0)
+  };
+
+  let totInfissi = 0, totTapp = 0, totZanz = 0, totCass = 0;
+
+  righe.forEach(r => {
+    const tipo = r.children[1].querySelector("select").value;
+    const larg = parseFloat(r.children[3].querySelector("input").value || 0);
+    const alt = parseFloat(r.children[4].querySelector("input").value || 0);
+    const tapp = r.children[5].querySelector("input").checked;
+    const zanz = r.children[6].querySelector("input").checked;
+    const cass = r.children[7].querySelector("input").checked;
+    const mq = (larg * alt) / 10000;
+
+    let prezzoBase = 0;
+    if (tipo === "Finestra") prezzoBase = prezzi.fin;
+    else if (tipo === "Porta finestra") prezzoBase = prezzi.porta;
+    else if (tipo === "Tapparella") prezzoBase = prezzi.tapp;
+    else if (tipo === "Zanzariera") prezzoBase = prezzi.zanz;
+
+    let parziale = mq * prezzoBase;
+    if (tapp) parziale += mq * prezzi.tapp;
+    if (zanz) parziale += mq * prezzi.zanz;
+    if (cass) parziale += mq * prezzi.cass;
+
+    r.querySelector(".tot").innerText = parziale.toFixed(2) + " €";
+
+    if (tipo.includes("Finestra")) totInfissi += mq * prezzoBase;
+    if (tapp) totTapp += mq * prezzi.tapp;
+    if (zanz) totZanz += mq * prezzi.zanz;
+    if (cass) totCass += mq * prezzi.cass;
+  });
+
+  const totNetto = totInfissi + totTapp + totZanz + totCass;
+  const iva = totNetto * 0.22;
+  const lordo = totNetto + iva;
+  const montPerc = parseFloat(document.getElementById("pMont").value || 0);
+  const montaggio = lordo * (montPerc / 100);
+  const totaleFinale = lordo + montaggio;
+  const acconto = totaleFinale * 0.25;
+  const rate = (totaleFinale * 0.75) / 120;
+
+  document.getElementById("totNetto").innerText = totNetto.toFixed(2) + " €";
+  document.getElementById("iva").innerText = iva.toFixed(2) + " €";
+  document.getElementById("totLordo").innerText = lordo.toFixed(2) + " €";
+  document.getElementById("montaggio").innerText = montaggio.toFixed(2) + " €";
+  document.getElementById("acconto").innerText = acconto.toFixed(2) + " €";
+  document.getElementById("rate").innerText = rate.toFixed(2) + " €/mese";
+
+  aggiornaRiepilogo(totInfissi, totTapp, totZanz, totCass, montaggio, totaleFinale);
+}
+
+// Riepilogo per categorie
+function aggiornaRiepilogo(i, t, z, c, m, tot) {
+  const div = document.getElementById("riepilogoCat");
+  let html = "<table><tr><th>Categoria</th><th>Totale €</th></tr>";
+  if (i > 0) html += `<tr><td>Infissi</td><td>${i.toFixed(2)}</td></tr>`;
+  if (t > 0) html += `<tr><td>Tapparelle</td><td>${t.toFixed(2)}</td></tr>`;
+  if (z > 0) html += `<tr><td>Zanzariere</td><td>${z.toFixed(2)}</td></tr>`;
+  if (c > 0) html += `<tr><td>Cassonetti</td><td>${c.toFixed(2)}</td></tr>`;
+  html += `<tr><td><strong>Montaggio</strong></td><td>${m.toFixed(2)}</td></tr>`;
+  html += `<tr><th>Totale complessivo</th><th>${tot.toFixed(2)}</th></tr></table>`;
+  div.innerHTML = html;
+}
+
+// Duplica preventivo
+function duplicaPreventivo() {
+  numPreventivo++;
+  document.getElementById("numPrev").innerText = "PREV-2025-" + String(numPreventivo).padStart(3, "0");
+}
+
+// Firma digitale
+let canvas, ctx, drawing = false;
+function initFirma() {
+  canvas = document.getElementById("firma");
+  ctx = canvas.getContext("2d");
+  ctx.strokeStyle = "#003366";
+  ctx.lineWidth = 2;
+
+  canvas.addEventListener("mousedown", start);
+  canvas.addEventListener("mousemove", draw);
+  canvas.addEventListener("mouseup", stop);
+  canvas.addEventListener("touchstart", start);
+  canvas.addEventListener("touchmove", draw);
+  canvas.addEventListener("touchend", stop);
+}
+
+function start(e) {
+  drawing = true;
+  ctx.beginPath();
+  ctx.moveTo(getX(e), getY(e));
+  e.preventDefault();
+}
+
+function draw(e) {
+  if (!drawing) return;
+  ctx.lineTo(getX(e), getY(e));
+  ctx.stroke();
+  e.preventDefault();
+}
+
+function stop(e) {
+  drawing = false;
+  e.preventDefault();
+}
+
+function getX(e) { return e.touches ? e.touches[0].clientX - canvas.offsetLeft : e.offsetX; }
+function getY(e) { return e.touches ? e.touches[0].clientY - canvas.offsetTop : e.offsetY; }
+
+function cancellaFirma() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// Stampa
+function stampa() { window.print(); }
+
+// Download PDF (approccio semplice: salva come stampa PDF)
+function scaricaPDF() {
+  window.print(); // Safari/iPad consente "Salva come PDF"
+}
+</script>
+</body>
+</html>
