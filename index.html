@@ -1,171 +1,229 @@
-<!DOCTYPE html>  
-<html lang="it">  
-<head>  
-<meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width, initial-scale=1.0">  
-<title>TBT2 Serramenti - Preventivo Finestre e Accessori</title>  
-<link rel="icon" type="image/png" href="favicon.png">  
-<style>  
-    body {  
-        font-family: Arial, sans-serif;  
-        background: linear-gradient(180deg, #ffffff 0%, #e8f0ff 100%);  
-        margin: 0;  
-        padding: 0;  
-        color: #003366;  
-    }  
-    header {  
-        text-align: center;  
-        border-bottom: 4px solid #003366;  
-        padding: 20px;  
-    }  
-    header img {  
-        height: 70px;  
-    }  
-    h1 {  
-        margin-top: 10px;  
-        font-size: 28px;  
-    }  
-    main {  
-        padding: 20px;  
-    }  
-    table {  
-        width: 100%;  
-        border-collapse: collapse;  
-        margin-top: 20px;  
-    }  
-    th, td {  
-        border: 1px solid #003366;  
-        padding: 8px;  
-        text-align: center;  
-    }  
-    th {  
-        background-color: #003366;  
-        color: white;  
-    }  
-    .btn {  
-        background-color: #003366;  
-        color: white;  
-        border: none;  
-        padding: 10px 20px;  
-        cursor: pointer;  
-        font-size: 16px;  
-        margin: 10px 5px;  
-    }  
-    .btn:hover {  
-        background-color: #0055aa;  
-    }  
-    footer {  
-        text-align: center;  
-        font-size: 12px;  
-        color: #555;  
-        margin-top: 30px;  
-        border-top: 1px solid #ccc;  
-        padding: 10px;  
-    }  
-</style>  
-</head>  
-<body>  
-  
-<header>  
-    <img src="Logo-TBT2.png" alt="Logo TBT2">  
-    <h1>Preventivo Finestre e Accessori</h1>  
-    <p><em>Fornitura e posa in opera di infissi, tapparelle e zanzariere</em></p>  
-    <p><strong>Documento riservato al cliente</strong></p>  
-</header>  
-  
-<main>  
-    <h2>Dati Cliente</h2>  
-    <input type="text" id="cliente" placeholder="Nome Cliente" style="width:48%;padding:5px;">  
-    <input type="text" id="indirizzo" placeholder="Indirizzo Cliente" style="width:48%;padding:5px;">  
-  
-    <h2>Tabella Calcolo</h2>  
-    <table id="preventivo">  
-        <tr>  
-            <th>Stanza</th>  
-            <th>Tipologia</th>  
-            <th>N. Ante</th>  
-            <th>Larghezza (cm)</th>  
-            <th>Altezza (cm)</th>  
-            <th>Prezzo €/m²</th>  
-            <th>Totale</th>  
-        </tr>  
-        <tr>  
-            <td><input type="text" placeholder="Es. Cucina"></td>  
-            <td>  
-                <select>  
-                    <option>Finestra</option>  
-                    <option>Porta finestra</option>  
-                    <option>Tapparella</option>  
-                    <option>Zanzariera</option>  
-                </select>  
-            </td>  
-            <td>  
-                <select>  
-                    <option>1</option><option>2</option><option>3</option>  
-                </select>  
-            </td>  
-            <td><input type="number" class="larg" placeholder="cm"></td>  
-            <td><input type="number" class="alt" placeholder="cm"></td>  
-            <td><input type="number" class="prezzo" placeholder="€/m²"></td>  
-            <td class="tot">0.00 €</td>  
-        </tr>  
-    </table>  
-  
-    <button class="btn" onclick="aggiungiRiga()">+ Aggiungi Riga</button>  
-    <button class="btn" onclick="calcolaTotale()">Calcola Totale</button>  
-    <button class="btn" onclick="generaPDF()">Genera PDF</button>  
-  
-    <h2>Riepilogo</h2>  
-    <p><strong>Totale Netto:</strong> <span id="totNetto">0.00 €</span></p>  
-    <p><strong>IVA (22%):</strong> <span id="iva">0.00 €</span></p>  
-    <p><strong>Totale Lordo:</strong> <span id="totLordo">0.00 €</span></p>  
-    <p><strong>Acconto 25%:</strong> <span id="acconto">0.00 €</span></p>  
-    <p><strong>Saldo in 120 rate:</strong> <span id="rate">0.00 €</span></p>  
-  
-</main>  
-  
-<footer>  
-    Documento generato automaticamente - © TBT2 Serramenti s.r.l. | www.tbt2.com  
-</footer>  
-  
-<script>  
-function aggiungiRiga() {  
-    let table = document.getElementById("preventivo");  
-    let row = table.insertRow(-1);  
-    row.innerHTML = `  
-        <td><input type="text" placeholder="Stanza"></td>  
-        <td><select>  
-            <option>Finestra</option><option>Porta finestra</option>  
-            <option>Tapparella</option><option>Zanzariera</option></select></td>  
-        <td><select><option>1</option><option>2</option><option>3</option></select></td>  
-        <td><input type="number" class="larg" placeholder="cm"></td>  
-        <td><input type="number" class="alt" placeholder="cm"></td>  
-        <td><input type="number" class="prezzo" placeholder="€/m²"></td>  
-        <td class="tot">0.00 €</td>`;  
-}  
-  
-function calcolaTotale() {  
-    let righe = document.querySelectorAll("#preventivo tr");  
-    let tot = 0;  
-    for (let i = 1; i < righe.length; i++) {  
-        let larg = righe[i].querySelector(".larg")?.value || 0;  
-        let alt = righe[i].querySelector(".alt")?.value || 0;  
-        let prezzo = righe[i].querySelector(".prezzo")?.value || 0;  
-        let mq = (larg * alt) / 10000;  
-        let parziale = mq * prezzo;  
-        if (!isNaN(parziale)) {  
-            righe[i].querySelector(".tot").innerText = parziale.toFixed(2) + " €";  
-            tot += parziale;  
-        }  
-    }  
-    document.getElementById("totNetto").innerText = tot.toFixed(2) + " €";  
-    let iva = tot * 0.22;  
-    document.getElementById("iva").innerText = iva.toFixed(2) + " €";  
-    let lordo = tot + iva;  
-    document.getElementById("totLordo").innerText = lordo.toFixed(2) + " €";  
-    document.getElementById("acconto").innerText = (lordo * 0.25).toFixed(2) + " €";  
-    document.getElementById("rate").innerText = ((lordo * 0.75) / 120).toFixed(2) + " €/mese";  
-}  
-</script>  
-</body>  
-</html>   
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TBT2 Serramenti - Preventivo Finestre e Accessori</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(180deg, #ffffff 0%, #e8f0ff 100%);
+    margin: 0;
+    padding: 0;
+    color: #003366;
+  }
+  header {
+    text-align: center;
+    border-bottom: 4px solid #003366;
+    padding: 20px;
+  }
+  header img { height: 70px; }
+  h1 { margin-top: 10px; font-size: 28px; }
+  main { padding: 20px; max-width: 1000px; margin: auto; }
+  input, select {
+    border: 1px solid #003366;
+    border-radius: 4px;
+    padding: 5px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  th, td {
+    border: 1px solid #003366;
+    padding: 8px;
+    text-align: center;
+  }
+  th {
+    background-color: #003366;
+    color: white;
+  }
+  .btn {
+    background-color: #003366;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 10px 5px;
+    border-radius: 4px;
+  }
+  .btn:hover { background-color: #0055aa; }
+  footer {
+    text-align: center;
+    font-size: 12px;
+    color: #555;
+    margin-top: 30px;
+    border-top: 1px solid #ccc;
+    padding: 10px;
+  }
+  .totali {
+    background: #f8fbff;
+    border: 1px solid #003366;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 25px;
+  }
+  #firmaCanvas {
+    border: 2px solid #003366;
+    border-radius: 6px;
+    width: 100%;
+    height: 150px;
+    background: #fff;
+    touch-action: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="Logo-TBT2.png" alt="Logo TBT2">
+  <h1>Preventivo Finestre e Accessori</h1>
+  <p><em>Fornitura e posa in opera di infissi, tapparelle e zanzariere</em></p>
+</header>
+
+<main>
+  <h2>Dati Cliente</h2>
+  <input type="text" id="cliente" placeholder="Nome Cliente" style="width:48%;padding:5px;">
+  <input type="text" id="indirizzo" placeholder="Indirizzo Cliente" style="width:48%;padding:5px;">
+
+  <h2>Tabella Calcolo</h2>
+  <table id="preventivo">
+    <tr>
+      <th>Stanza</th>
+      <th>Tipologia</th>
+      <th>N. Ante</th>
+      <th>Larghezza (cm)</th>
+      <th>Altezza (cm)</th>
+      <th>Prezzo €/m²</th>
+      <th>Totale</th>
+    </tr>
+    <tr>
+      <td><input type="text" placeholder="Es. Cucina"></td>
+      <td>
+        <select>
+          <option>Finestra</option>
+          <option>Porta finestra</option>
+          <option>Tapparella</option>
+          <option>Zanzariera</option>
+        </select>
+      </td>
+      <td>
+        <select>
+          <option>1</option><option>2</option><option>3</option>
+        </select>
+      </td>
+      <td><input type="number" class="larg" placeholder="cm"></td>
+      <td><input type="number" class="alt" placeholder="cm"></td>
+      <td><input type="number" class="prezzo" placeholder="€/m²"></td>
+      <td class="tot">0.00 €</td>
+    </tr>
+  </table>
+
+  <button class="btn" onclick="aggiungiRiga()">+ Aggiungi Riga</button>
+  <button class="btn" onclick="calcolaTotale()">Calcola Totale</button>
+
+  <div class="totali">
+    <p><strong>Totale Netto:</strong> <span id="totNetto">0.00 €</span></p>
+    <p><strong>IVA (22%):</strong> <span id="iva">0.00 €</span></p>
+    <p><strong>Totale Lordo:</strong> <span id="totLordo">0.00 €</span></p>
+    <p><strong>Acconto 25%:</strong> <span id="acconto">0.00 €</span></p>
+    <p><strong>Saldo in 120 rate:</strong> <span id="rate">0.00 €</span></p>
+  </div>
+
+  <h2>Firma Cliente</h2>
+  <canvas id="firmaCanvas"></canvas><br>
+  <button class="btn" onclick="cancellaFirma()">Cancella Firma</button>
+
+</main>
+
+<footer>
+  Documento generato automaticamente – © 2025 TBT2 Serramenti s.r.l. | www.tbt2.com
+</footer>
+
+<script>
+function aggiungiRiga() {
+  let table = document.getElementById("preventivo");
+  let row = table.insertRow(-1);
+  row.innerHTML = `
+    <td><input type="text" placeholder="Stanza"></td>
+    <td><select>
+      <option>Finestra</option>
+      <option>Porta finestra</option>
+      <option>Tapparella</option>
+      <option>Zanzariera</option>
+    </select></td>
+    <td><select><option>1</option><option>2</option><option>3</option></select></td>
+    <td><input type="number" class="larg" placeholder="cm"></td>
+    <td><input type="number" class="alt" placeholder="cm"></td>
+    <td><input type="number" class="prezzo" placeholder="€/m²"></td>
+    <td class="tot">0.00 €</td>`;
+}
+
+function calcolaTotale() {
+  let righe = document.querySelectorAll("#preventivo tr");
+  let tot = 0;
+  for (let i = 1; i < righe.length; i++) {
+    let larg = righe[i].querySelector(".larg")?.value || 0;
+    let alt = righe[i].querySelector(".alt")?.value || 0;
+    let prezzo = righe[i].querySelector(".prezzo")?.value || 0;
+    let mq = (larg * alt) / 10000;
+    let parziale = mq * prezzo;
+    if (!isNaN(parziale)) {
+      righe[i].querySelector(".tot").innerText = parziale.toFixed(2) + " €";
+      tot += parziale;
+    }
+  }
+  document.getElementById("totNetto").innerText = tot.toFixed(2) + " €";
+  let iva = tot * 0.22;
+  document.getElementById("iva").innerText = iva.toFixed(2) + " €";
+  let lordo = tot + iva;
+  document.getElementById("totLordo").innerText = lordo.toFixed(2) + " €";
+  document.getElementById("acconto").innerText = (lordo * 0.25).toFixed(2) + " €";
+  document.getElementById("rate").innerText = ((lordo * 0.75) / 120).toFixed(2) + " €/mese";
+}
+
+// Firma digitale
+const canvas = document.getElementById('firmaCanvas');
+const ctx = canvas.getContext('2d');
+let disegnando = false;
+
+canvas.addEventListener('touchstart', start, false);
+canvas.addEventListener('touchmove', draw, false);
+canvas.addEventListener('mousedown', start, false);
+canvas.addEventListener('mousemove', draw, false);
+canvas.addEventListener('mouseup', stop, false);
+canvas.addEventListener('mouseout', stop, false);
+
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+  const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+  return { x, y };
+}
+function start(e) {
+  e.preventDefault();
+  disegnando = true;
+  const pos = getPos(e);
+  ctx.beginPath();
+  ctx.moveTo(pos.x, pos.y);
+}
+function draw(e) {
+  if (!disegnando) return;
+  e.preventDefault();
+  const pos = getPos(e);
+  ctx.lineTo(pos.x, pos.y);
+  ctx.strokeStyle = "#003366";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+function stop() { disegnando = false; }
+function cancellaFirma() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+</script>
+
+</body>
+</html>
